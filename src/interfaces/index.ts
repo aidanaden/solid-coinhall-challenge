@@ -1,4 +1,5 @@
 export interface TokenData {
+  address: string
   name: string
   ticker: string
   supply: number

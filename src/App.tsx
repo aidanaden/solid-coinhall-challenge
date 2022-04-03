@@ -23,7 +23,7 @@ const App: Component = () => {
       lcd.wasm
         .contractQuery(tokenAddy, { token_info: {} })
         .then((tokenInfoResponse: TokenInfoResponse) => {
-          addTokenToStorage(tokenInfoResponse)
+          addTokenToStorage(tokenInfoResponse, tokenAddy)
         })
 
       target.value = ''
@@ -55,7 +55,7 @@ const App: Component = () => {
         onKeyDown={addToken}
       />
       <Show when={state.tokens.length > 0}>
-        <ul class="w-full ">
+        <ul class="w-full mb-2 ">
           <For each={state.tokens}>
             {(tokenData: TokenData) => (
               <li class="flex flex-row justify-between p-4 border-[1px] ">
@@ -67,7 +67,7 @@ const App: Component = () => {
 
                 <button
                   class="bg-transparent hover:text-gray-500 duration-200 border-none p-2 self-center"
-                  onClick={[removeTokenFromStorage, tokenData.ticker]}
+                  onClick={[removeTokenFromStorage, tokenData.address]}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -87,7 +87,7 @@ const App: Component = () => {
           </For>
         </ul>
       </Show>
-      <div>{`${state.tokens.length} tokens(s) left`}</div>
+      <div>{`${state.tokens.length} token(s) left`}</div>
     </section>
   )
 }
