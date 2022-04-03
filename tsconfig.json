@@ -10,5 +10,12 @@
     "types": ["vite/client"],
     "noEmit": true,
     "isolatedModules": true
-  }
+  },
+  "include": [
+    "./src/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.css",
+    "**.*.js"
+  ],
 }
