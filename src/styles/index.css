@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  /* @font-face {
+    font-family: 'Moderat';
+    src: url('../../public/fonts/Moderat-Regular.woff') format('woff'),
+      url('../../public/fonts/Moderat-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
+    font-style: normal;
+  } */
+  body {
+    /* @apply bg-woodsmoke-900 scrollbar-thin; */
+  }
+}
+
+@layer components {
+  /* .sidebarIcon {
+        @apply h-6 text-[#808080] cursor-pointer;
+    } */
+  .iconBtn {
+    @apply justify-end self-center p-2 border-gray-600 border-[2px] rounded-lg
+          text-gray-500 hover:bg-gray-600 duration-200 hover:text-gray-200
+          disabled:bg-gray-700 disabled:text-gray-600 disabled:border-gray-700;
+  }
+}
