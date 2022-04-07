@@ -74,7 +74,7 @@ const App: Component = () => {
   })
 
   return (
-    <main class="max-w-2xl md:mx-auto text-center p-4">
+    <main class="max-w-2xl md:mx-auto text-center p-4 h-full min-h-[100vh]">
       <div class=" max-w-lg md:mx-auto mb-8">
         <p class="text-2xl md:text-4xl text-center py-16 font-semibold text-gray-300">
           Coinhall challenge
