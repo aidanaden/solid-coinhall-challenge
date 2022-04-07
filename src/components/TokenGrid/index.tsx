@@ -5,7 +5,7 @@ import TokenCard from './TokenCard'
 
 export default function index(props) {
   return (
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-gray-300">
       <For each={props.tokens}>
         {(tokenData: TokenData) => (
           <TokenCard

@@ -5,10 +5,16 @@ import DeleteButton from '../DeleteButton'
 
 export default function index(props) {
   return (
-    <div class="overflow-x-auto mb-4">
-      <table class="table table-compact w-full">
+    <div
+      class="overflow-y-scroll max-h-[512px] 
+      scrollbar-thumb-et-light-100 md:-mr-4
+      scrollbar-track-et-dark-100 md:scrollbar-thumb-rounded
+      md:scrollbar-thin md:scrollbar-thumb-et-light-100 md:pr-4
+      md:scrollbar-thumb-rounded-lg text-gray-300"
+    >
+      <table class="table-normal w-full relative shadow-xl">
         <thead>
-          <tr>
+          <tr class="bg-et-dark-100 sticky top-0">
             <th></th>
             <th>Name</th>
             <th>Ticker</th>
@@ -16,10 +22,10 @@ export default function index(props) {
             <th></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="max-h-96 overflow-y-scroll">
           <For each={props.tokens}>
             {(tokenData: TokenData) => (
-              <tr>
+              <tr class="bg-et-light-100">
                 <th>{props.tokens.indexOf(tokenData) + 1}</th>
                 <td>{tokenData.name}</td>
                 <td>{tokenData.ticker}</td>

@@ -17,6 +17,12 @@ export default function createLocalStore(value: LocalStoreParams) {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state))
   )
 
+  const containsTokenAddress = (address: string) => {
+    return (
+      state.tokens.filter((t: TokenData) => t.address == address).length !== 0
+    )
+  }
+
   const addTokenToStorage = (
     tokenInfoResponse: TokenInfoResponse,
     tokenAddress: string
@@ -26,22 +32,24 @@ export default function createLocalStore(value: LocalStoreParams) {
     const tokenSupply =
       tokenInfoResponse.total_supply / Math.pow(10, tokenInfoResponse.decimals)
 
-    setState({
-      tokens: [
-        {
-          address: tokenAddress,
-          name: tokenName,
-          ticker: tokenTicker,
-          supply: tokenSupply,
-        },
-        ...state.tokens,
-      ],
-    })
+    const tokenData = {
+      address: tokenAddress,
+      name: tokenName,
+      ticker: tokenTicker,
+      supply: tokenSupply,
+    }
+
+    setState('tokens', (tokens) => [tokenData, ...tokens])
   }
 
   const removeTokenFromStorage = (address: string) => {
     setState('tokens', (tokens) => tokens.filter((t) => t.address !== address))
   }
 
-  return { state, addTokenToStorage, removeTokenFromStorage }
+  return {
+    state,
+    addTokenToStorage,
+    containsTokenAddress,
+    removeTokenFromStorage,
+  }
 }
