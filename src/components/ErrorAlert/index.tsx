@@ -1,9 +1,9 @@
 export default function index(props) {
   return (
     <div
-      class={`alert alert-error rounded-lg text-sm sticky bottom-4
-      mt-4 lg:mt-8 block transition duration-500 opacity-100 hidden:opacity-0
-      w-full self-center z-10 md:max-w-lg mx-auto`}
+      class={`alert alert-error rounded-lg text-sm sticky
+      transition duration-300 opacity-100 bottom-4 mt-auto
+      hidden:opacity-0 z-10`}
     >
       <div>
         <svg
@@ -19,7 +19,7 @@ export default function index(props) {
             d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>{props.error}</span>
+        <span>{props.error.trim()}</span>
       </div>
     </div>
   )

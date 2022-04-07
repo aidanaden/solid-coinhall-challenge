@@ -74,46 +74,52 @@ const App: Component = () => {
   })
 
   return (
-    <main class="max-w-2xl md:mx-auto text-center p-4 h-full min-h-[100vh]">
-      <div class=" max-w-lg md:mx-auto mb-8">
-        <p class="text-2xl md:text-4xl text-center py-16 font-semibold text-gray-300">
-          Coinhall challenge
-        </p>
-        <input
-          class="input w-full self-center input-bordered "
-          placeholder="Enter address"
-          onKeyDown={addToken}
-        />
-        {/* <ErrorAlert error={errorAlert()} when={errorAlert() !== ''} /> */}
-      </div>
-
-      <div class="w-full text-right mb-3 flex flex-row space-x-2 justify-end">
-        <ListButton
-          onClick={() => setDisplayModeList(true)}
-          disabled={displayModeList()}
-        />
-        <GridButton
-          onClick={() => setDisplayModeList(false)}
-          disabled={!displayModeList()}
-        />
-      </div>
-      <Show
-        when={state.tokens.length > 0 && displayModeList()}
-        fallback={
-          <TokenGrid
+    <main class="h-full min-h-[100vh]">
+      <div
+        class="max-w-2xl mx-auto text-center
+        p-4 h-full min-h-[100vh] flex flex-col"
+      >
+        <div class="max-w-lg w-full mx-auto mb-8">
+          <p
+            class="text-2xl md:text-4xl text-center
+            py-16 font-semibold text-gray-300"
+          >
+            Coinhall challenge
+          </p>
+          <input
+            class="input w-full self-center input-bordered "
+            placeholder="Enter address"
+            onKeyDown={addToken}
+          />
+        </div>
+        <div class="w-full text-right mb-3 flex flex-row space-x-2 justify-end">
+          <ListButton
+            onClick={() => setDisplayModeList(true)}
+            disabled={displayModeList()}
+          />
+          <GridButton
+            onClick={() => setDisplayModeList(false)}
+            disabled={!displayModeList()}
+          />
+        </div>
+        <Show
+          when={state.tokens.length > 0 && displayModeList()}
+          fallback={
+            <TokenGrid
+              removeTokenFromStorage={removeTokenFromStorage}
+              tokens={state.tokens}
+            />
+          }
+        >
+          <TokenTable
             removeTokenFromStorage={removeTokenFromStorage}
             tokens={state.tokens}
           />
-        }
-      >
-        <TokenTable
-          removeTokenFromStorage={removeTokenFromStorage}
-          tokens={state.tokens}
-        />
-      </Show>
-      <Show when={errorAlert() !== ''}>
-        <ErrorAlert error={errorAlert()} when={errorAlert() !== ''} />
-      </Show>
+        </Show>
+        <Show when={errorAlert() !== ''}>
+          <ErrorAlert error={errorAlert()} when={errorAlert() !== ''} />
+        </Show>
+      </div>
     </main>
   )
 }
