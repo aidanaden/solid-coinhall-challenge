@@ -4,6 +4,7 @@ import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import solidPlugin from "vite-plugin-solid";
 import GlobalsPolyfills from "@esbuild-plugins/node-globals-polyfill";
+import topLevelAwait from "vite-plugin-top-level-await";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -26,7 +27,12 @@ export default defineConfig({
   //    peerMaxConcurrentStreams: 300,
   //  },
   //},
-  plugins: [solidPlugin(), tsconfigPaths(), svgr()],
+  plugins: [solidPlugin(), tsconfigPaths(), svgr(), topLevelAwait({
+      // The export name of top-level await promise for each chunk module
+      promiseExportName: "__tla",
+      // The function to generate import names of top-level await promise in each chunk module
+      promiseImportName: i => `__tla_${i}`
+    })],
   //build: {
   //  sourcemap: true,
   //  rollupOptions: {
