@@ -2,7 +2,8 @@ export default function index(props) {
   return (
     <button
       class="bg-transparent hover:text-et-info-100 duration-200
-      hover:bg-et-light-100 p-1 rounded-md self-end "
+      hover:bg-et-dark-100 p-1 rounded-md self-end text-et-info-100/40
+      "
       onClick={[props.removeTokenFromStorage, props.address]}
     >
       <svg

@@ -1,6 +1,7 @@
 import { createEffect } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import { LOCAL_STORAGE_KEY } from '../constants'
+import { NetworkMode } from '../enums'
 import { TokenData, TokenInfoResponse } from '../interfaces'
 
 export interface LocalStoreParams {
@@ -17,15 +18,18 @@ export default function createLocalStore(value: LocalStoreParams) {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state))
   )
 
-  const containsTokenAddress = (address: string) => {
+  const containsTokenAddress = (address: string, network: NetworkMode) => {
     return (
-      state.tokens.filter((t: TokenData) => t.address == address).length !== 0
+      state.tokens.filter(
+        (t: TokenData) => t.address == address && t.network == network
+      ).length !== 0
     )
   }
 
   const addTokenToStorage = (
     tokenInfoResponse: TokenInfoResponse,
-    tokenAddress: string
+    tokenAddress: string,
+    network: NetworkMode
   ) => {
     const tokenName = tokenInfoResponse.name
     const tokenTicker = tokenInfoResponse.symbol
@@ -37,17 +41,25 @@ export default function createLocalStore(value: LocalStoreParams) {
       name: tokenName,
       ticker: tokenTicker,
       supply: tokenSupply,
+      network: network,
     }
 
     setState('tokens', (tokens) => [tokenData, ...tokens])
   }
 
-  const removeTokenFromStorage = (address: string) => {
-    setState('tokens', (tokens) => tokens.filter((t) => t.address !== address))
+  const removeTokenFromStorage = (address: string, network: NetworkMode) => {
+    setState('tokens', (tokens) =>
+      tokens.filter((t) => t.address !== address && t.network !== network)
+    )
+  }
+
+  const getModeToken = (network: NetworkMode) => {
+    return state.tokens.filter((t) => t.network === network)
   }
 
   return {
     state,
+    getModeToken,
     addTokenToStorage,
     containsTokenAddress,
     removeTokenFromStorage,

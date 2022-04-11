@@ -25,7 +25,7 @@
   .iconBtn {
     @apply justify-end self-center p-2 border-et-info-100/40 border-[2px] rounded-lg
           text-et-info-100 hover:bg-et-light-100 duration-200 hover:text-gray-200
-          hover:border-et-light-100
-          disabled:bg-et-dark-100 disabled:text-et-light-100 disabled:border-et-dark-100;
+          hover:border-et-light-100 disabled:bg-et-dark-100 disabled:text-et-light-100
+          disabled:border-et-dark-100;
   }
 }
