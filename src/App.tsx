@@ -4,23 +4,26 @@ import {
   createResource,
   createSignal,
   onCleanup,
+  onMount,
   Show,
 } from 'solid-js'
 
 import { ENTER_KEY } from './constants'
 import createLocalStore from './store/createLocalStore'
-import { TokenInfoResponse } from './interfaces'
+import { TokenData, TokenInfoResponse } from './interfaces'
 import createTerraLcd from './store/createTerraLcd'
-import TokenTable from './components/TokenTable'
+import TokenTable from './components/Tables/TokenTable'
 import TokenGrid from './components/TokenGrid'
 import GridButton from './components/GridButton'
 import ListButton from './components/ListButton'
 import ErrorAlert from './components/ErrorAlert'
 import Tab from './components/Tab'
 import { NetworkMode } from './enums'
+import { fetchTokenPrice } from './functions'
+import WalletTable from './components/Tables/WalletTable'
 
 const App: Component = () => {
-  const [networkMode, setNetworkMode] = createSignal(NetworkMode.TEST)
+  const [networkMode, setNetworkMode] = createSignal(NetworkMode.MAIN)
   const [lcd, { refetch }] = createResource(async () => {
     console.log('getting resource!')
     return await createTerraLcd(networkMode())
@@ -28,21 +31,23 @@ const App: Component = () => {
   const [addressModeToken, setAddressModeToken] = createSignal(true)
   const [displayModeList, setDisplayModeList] = createSignal(true)
   const [errorAlert, setErrorAlert] = createSignal('')
+  const [walletTokens, setWalletTokens] = createSignal([])
   const {
     state,
     getModeToken,
     addTokenToStorage,
     containsTokenAddress,
     removeTokenFromStorage,
+    updateTokensByNetwork,
   } = createLocalStore({
     tokens: [],
   })
 
-  const handleSearch = ({ target, keyCode }) => {
+  const handleSearch = (props) => {
     if (addressModeToken()) {
-      addToken({ target, keyCode })
+      addToken(props)
     } else {
-      addWalletAddress({ target, keyCode })
+      addWalletAddress(props)
     }
   }
 
@@ -52,9 +57,22 @@ const App: Component = () => {
     if (keyCode == ENTER_KEY && tokenAddy) {
       lcd()
         .wasm.contractQuery(tokenAddy, { token_info: {} })
-        .then((tokenInfoResponse: TokenInfoResponse) => {
+        .then(async (tokenInfoResponse: TokenInfoResponse) => {
+          // Check if token exists in store
           if (!containsTokenAddress(tokenAddy, networkMode())) {
-            addTokenToStorage(tokenInfoResponse, tokenAddy, networkMode())
+            if (networkMode() === NetworkMode.MAIN) {
+              // Get token price if mainnet
+              const tokenPrice = await fetchTokenPrice(tokenInfoResponse.symbol)
+              addTokenToStorage(
+                tokenInfoResponse,
+                tokenAddy,
+                networkMode(),
+                tokenPrice
+              )
+            } else {
+              // Skip token price if testnet
+              addTokenToStorage(tokenInfoResponse, tokenAddy, networkMode())
+            }
           } else {
             setErrorAlert('Token address has already been added!')
           }
@@ -66,17 +84,23 @@ const App: Component = () => {
     }
   }
 
+  // Set wallet tokens data
   const addWalletAddress = ({ target, keyCode }) => {
     const walletAddress = target.value.trim()
     if (keyCode == ENTER_KEY && walletAddress) {
       lcd()
         .bank.balance(walletAddress)
         .then((val) => {
+          const balanceTokens = []
           const [balance] = val
           balance.map((coin) => {
-            console.log(coin.denom.slice(1))
-            console.log(coin.mul(1 / 1000000).amount.toString())
+            const coinData = {
+              token: coin.denom.slice(1),
+              amount: coin.mul(1 / 1000000).amount.toString(),
+            }
+            balanceTokens.push(coinData)
           })
+          setWalletTokens(balanceTokens)
         })
         .catch((err) => {
           setErrorAlert(`${err}!`)
@@ -85,12 +109,14 @@ const App: Component = () => {
     }
   }
 
+  // Handle network change
   const handleNetworkChange = (e) => {
     const newNetworkMode = e.target.value
     console.log('network value changed to: ', newNetworkMode)
     setNetworkMode(newNetworkMode)
   }
 
+  // Display error pop-up for 3s
   createEffect(() => {
     console.log(errorAlert())
     const time = setTimeout(() => {
@@ -99,9 +125,25 @@ const App: Component = () => {
     onCleanup(() => clearTimeout(time))
   })
 
+  // Re-fetch LCD based on network mode (mainnet/testnet)
   createEffect(() => {
     networkMode()
     refetch()
+  })
+
+  // Update token prices in mainnet
+  onMount(() => {
+    if (networkMode() === NetworkMode.MAIN) {
+      Promise.all(
+        getModeToken(NetworkMode.MAIN).map(async (token: TokenData) => {
+          const updatedPrice = await fetchTokenPrice(token.ticker)
+          return { ...token, price: updatedPrice }
+        })
+      ).then((updatedTokens) => {
+        console.log('updating token prices with: ', updatedTokens)
+        updateTokensByNetwork(updatedTokens, NetworkMode.MAIN)
+      })
+    }
   })
 
   return (
@@ -110,13 +152,14 @@ const App: Component = () => {
         class="max-w-2xl mx-auto text-center
         p-4 h-full min-h-[100vh] flex flex-col"
       >
+        {/* Header section */}
         <div class="max-w-lg w-full mx-auto mb-12">
-          <p
-            class="text-2xl md:text-4xl text-center
-            py-16 font-semibold text-gray-300"
-          >
-            Coinhall challenge
-          </p>
+          <div class="text-center py-16">
+            <h1 class="text-2xl md:text-4xl font-semibold text-gray-300 mb-4">
+              Coinhall challenge
+            </h1>
+            <p class="text-gray-500">Price refreshes on first load</p>
+          </div>
           <div class="flex flex-row space-x-2">
             <input
               class="input w-full self-center input-bordered "
@@ -133,7 +176,8 @@ const App: Component = () => {
             </select>
           </div>
         </div>
-        <div class="w-full mb-3 flex flex-row justify-between ">
+        {/* Controls section */}
+        <div class="w-full mb-8 md:mb-4 flex flex-row justify-between ">
           <Tab
             condition={addressModeToken}
             setCondition={setAddressModeToken}
@@ -149,22 +193,35 @@ const App: Component = () => {
             />
           </div>
         </div>
+        {/* Table/Grid section */}
         <Show
-          when={state.tokens.length > 0 && displayModeList()}
+          when={!addressModeToken()}
           fallback={
-            <TokenGrid
-              removeTokenFromStorage={removeTokenFromStorage}
-              tokens={getModeToken(networkMode())}
-            />
+            <Show
+              when={state.tokens.length > 0 && displayModeList()}
+              fallback={
+                <TokenGrid
+                  removeTokenFromStorage={removeTokenFromStorage}
+                  tokens={getModeToken(networkMode())}
+                />
+              }
+            >
+              <TokenTable
+                removeTokenFromStorage={removeTokenFromStorage}
+                tokens={getModeToken(networkMode())}
+              />
+            </Show>
           }
         >
-          <TokenTable
-            removeTokenFromStorage={removeTokenFromStorage}
-            tokens={getModeToken(networkMode())}
-          />
+          <Show
+            when={walletTokens().length > 0 && displayModeList()}
+            fallback={<></>}
+          >
+            <WalletTable tokens={walletTokens()} />
+          </Show>
         </Show>
         <Show when={errorAlert() !== ''}>
-          <ErrorAlert error={errorAlert()} when={errorAlert() !== ''} />
+          <ErrorAlert error={errorAlert()} />
         </Show>
       </div>
     </main>

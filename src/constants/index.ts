@@ -18,3 +18,6 @@ export const MARS_MAIN_ADDRESS = 'terra12hgwnpupflfpuual532wgrxu2gjp0tcagzgx4n'
 export const ANC_MAIN_ADDRESS = 'terra14z56l0fp2lsf86zy3hty2z47ezkhnthtr9yq76'
 export const VKR_MAIN_ADDRESS = 'terra1dy9kmlm4anr92e42mrkjwzyvfqwz66un00rwr5'
 export const ORION_MAIN_ADDRESS = 'terra1mddcdx0ujx89f38gu7zspk2r2ffdl5enyz2u03'
+
+export const MAIN_PRICE_API =
+  'https://api.extraterrestrial.money/v1/api/prices?symbol='

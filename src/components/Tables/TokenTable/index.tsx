@@ -1,23 +1,19 @@
-import { For } from 'solid-js'
-import { formatTokenSupply } from '../../functions'
-import { TokenData } from '../../interfaces'
-import DeleteButton from '../DeleteButton'
+import { For, Show } from 'solid-js'
+import { formatNumerToString, formatTokenPrice } from '../../../functions'
+import { TokenData } from '../../../interfaces'
+import DeleteButton from '../../DeleteButton'
+import TableContainer from '../TableContainer'
 
 export default function index(props) {
   return (
-    <div
-      class="overflow-y-scroll max-h-[512px] 
-      scrollbar-thumb-et-light-100 md:-mr-4
-      scrollbar-track-et-dark-100 md:scrollbar-thumb-rounded
-      md:scrollbar-thin md:scrollbar-thumb-et-light-100 md:pr-4
-      md:scrollbar-thumb-rounded-lg text-gray-300"
-    >
+    <TableContainer>
       <table class="table-normal w-full relative shadow-xl">
         <thead>
           <tr class="bg-et-dark-100 sticky top-0">
             <th></th>
             <th>Name</th>
             <th>Ticker</th>
+            <th>Price</th>
             <th>Supply</th>
             <th></th>
           </tr>
@@ -29,7 +25,10 @@ export default function index(props) {
                 <th>{props.tokens.indexOf(tokenData) + 1}</th>
                 <td>{tokenData.name}</td>
                 <td>{tokenData.ticker}</td>
-                <td>{formatTokenSupply(tokenData.supply)}</td>
+                <Show when={tokenData.price} fallback={<td>?</td>}>
+                  <td>{formatTokenPrice(tokenData.price)}</td>
+                </Show>
+                <td>{formatNumerToString(tokenData.supply)}</td>
                 <td>
                   <DeleteButton
                     removeTokenFromStorage={props.removeTokenFromStorage}
@@ -41,6 +40,6 @@ export default function index(props) {
           </For>
         </tbody>
       </table>
-    </div>
+    </TableContainer>
   )
 }

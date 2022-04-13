@@ -21,7 +21,7 @@ export default function index(props) {
               }`}
         onClick={() => props.setCondition(false)}
       >
-        user
+        wallet
       </button>
     </div>
   )

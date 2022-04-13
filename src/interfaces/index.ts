@@ -6,6 +6,7 @@ export interface TokenData {
   ticker: string
   supply: number
   network: NetworkMode
+  price?: number
 }
 
 export interface TokenInfoResponse {

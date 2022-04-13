@@ -29,7 +29,8 @@ export default function createLocalStore(value: LocalStoreParams) {
   const addTokenToStorage = (
     tokenInfoResponse: TokenInfoResponse,
     tokenAddress: string,
-    network: NetworkMode
+    network: NetworkMode,
+    price?: number
   ) => {
     const tokenName = tokenInfoResponse.name
     const tokenTicker = tokenInfoResponse.symbol
@@ -42,6 +43,7 @@ export default function createLocalStore(value: LocalStoreParams) {
       ticker: tokenTicker,
       supply: tokenSupply,
       network: network,
+      price: price,
     }
 
     setState('tokens', (tokens) => [tokenData, ...tokens])
@@ -53,8 +55,37 @@ export default function createLocalStore(value: LocalStoreParams) {
     )
   }
 
+  // const updateTokenFromStorage = (
+  //   address: string,
+  //   network: NetworkMode,
+  //   updatedTokenData: TokenData
+  // ) => {
+  //   setState('tokens', (t) => t.address === address && t.network === network, {
+  //     ...updatedTokenData,
+  //   })
+  // }
+
   const getModeToken = (network: NetworkMode) => {
+    console.log('network: ', network)
     return state.tokens.filter((t) => t.network === network)
+  }
+
+  // const updateTokenPrice = (t: TokenData) => {
+  //   fetchTokenPrice(t.ticker).then((tokenPrice) => {
+  //     const updatedToken = { ...t, price: tokenPrice }
+  //     console.log('updated token data: ', updatedToken)
+  //     return updatedToken
+  //   })
+  // }
+
+  const updateTokensByNetwork = (
+    updatedTokens: TokenData[],
+    network: NetworkMode
+  ) => {
+    setState('tokens', (tokens) => [
+      ...tokens.filter((t) => t.network !== network),
+      ...updatedTokens,
+    ])
   }
 
   return {
@@ -63,5 +94,6 @@ export default function createLocalStore(value: LocalStoreParams) {
     addTokenToStorage,
     containsTokenAddress,
     removeTokenFromStorage,
+    updateTokensByNetwork,
   }
 }
