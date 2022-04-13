@@ -55,28 +55,10 @@ export default function createLocalStore(value: LocalStoreParams) {
     )
   }
 
-  // const updateTokenFromStorage = (
-  //   address: string,
-  //   network: NetworkMode,
-  //   updatedTokenData: TokenData
-  // ) => {
-  //   setState('tokens', (t) => t.address === address && t.network === network, {
-  //     ...updatedTokenData,
-  //   })
-  // }
-
   const getModeToken = (network: NetworkMode) => {
     console.log('network: ', network)
     return state.tokens.filter((t) => t.network === network)
   }
-
-  // const updateTokenPrice = (t: TokenData) => {
-  //   fetchTokenPrice(t.ticker).then((tokenPrice) => {
-  //     const updatedToken = { ...t, price: tokenPrice }
-  //     console.log('updated token data: ', updatedToken)
-  //     return updatedToken
-  //   })
-  // }
 
   const updateTokensByNetwork = (
     updatedTokens: TokenData[],
