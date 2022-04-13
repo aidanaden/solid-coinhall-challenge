@@ -134,8 +134,9 @@ const App: Component = () => {
   // Update token prices in mainnet
   onMount(() => {
     if (networkMode() === NetworkMode.MAIN) {
+      const mainTokens = getModeToken(NetworkMode.MAIN)
       Promise.all(
-        getModeToken(NetworkMode.MAIN).map(async (token: TokenData) => {
+        mainTokens.map(async (token: TokenData) => {
           const updatedPrice = await fetchTokenPrice(token.ticker)
           return { ...token, price: updatedPrice }
         })
