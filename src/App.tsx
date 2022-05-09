@@ -8,7 +8,12 @@ import {
   Show,
 } from 'solid-js'
 
-import { ENTER_KEY } from './constants'
+import {
+  ANC_MAIN_ADDRESS,
+  ASTRO_MAIN_ADDRESS,
+  ENTER_KEY,
+  MARS_MAIN_ADDRESS,
+} from './constants'
 import createLocalStore from './store/createLocalStore'
 import { TokenData, TokenInfoResponse } from './interfaces'
 import createTerraLcd from './store/createTerraLcd'
@@ -21,6 +26,7 @@ import Tab from './components/Tab'
 import { NetworkMode } from './enums'
 import { fetchTokenPrice } from './functions'
 import WalletTable from './components/Tables/WalletTable'
+import { on } from 'solid-js'
 
 const App: Component = () => {
   const [networkMode, setNetworkMode] = createSignal(NetworkMode.MAIN)
@@ -51,35 +57,39 @@ const App: Component = () => {
     }
   }
 
+  const queryAddTokenToStorage = (tokenAddy: string) => {
+    lcd()
+      .wasm.contractQuery(tokenAddy, { token_info: {} })
+      .then(async (tokenInfoResponse: TokenInfoResponse) => {
+        // Check if token exists in store
+        if (!containsTokenAddress(tokenAddy, networkMode())) {
+          if (networkMode() === NetworkMode.MAIN) {
+            // Get token price if mainnet
+            const tokenPrice = await fetchTokenPrice(tokenInfoResponse.symbol)
+            addTokenToStorage(
+              tokenInfoResponse,
+              tokenAddy,
+              networkMode(),
+              tokenPrice
+            )
+          } else {
+            // Skip token price if testnet
+            addTokenToStorage(tokenInfoResponse, tokenAddy, networkMode())
+          }
+        } else {
+          setErrorAlert('Token address has already been added!')
+        }
+      })
+      .catch((err) => {
+        setErrorAlert(`${err}!`)
+      })
+  }
+
   //add token addy data to local store
   const addToken = ({ target, keyCode }) => {
     const tokenAddy = target.value.trim()
     if (keyCode == ENTER_KEY && tokenAddy) {
-      lcd()
-        .wasm.contractQuery(tokenAddy, { token_info: {} })
-        .then(async (tokenInfoResponse: TokenInfoResponse) => {
-          // Check if token exists in store
-          if (!containsTokenAddress(tokenAddy, networkMode())) {
-            if (networkMode() === NetworkMode.MAIN) {
-              // Get token price if mainnet
-              const tokenPrice = await fetchTokenPrice(tokenInfoResponse.symbol)
-              addTokenToStorage(
-                tokenInfoResponse,
-                tokenAddy,
-                networkMode(),
-                tokenPrice
-              )
-            } else {
-              // Skip token price if testnet
-              addTokenToStorage(tokenInfoResponse, tokenAddy, networkMode())
-            }
-          } else {
-            setErrorAlert('Token address has already been added!')
-          }
-        })
-        .catch((err) => {
-          setErrorAlert(`${err}!`)
-        })
+      queryAddTokenToStorage(tokenAddy)
       target.value = ''
     }
   }
@@ -129,6 +139,20 @@ const App: Component = () => {
   createEffect(() => {
     networkMode()
     refetch()
+  })
+
+  // Add default mainnet tokens if empty
+  createEffect(() => {
+    if (
+      lcd() &&
+      networkMode() === NetworkMode.MAIN &&
+      getModeToken(NetworkMode.MAIN).length === 0
+    ) {
+      console.log('adding default tokens')
+      queryAddTokenToStorage(ASTRO_MAIN_ADDRESS)
+      queryAddTokenToStorage(MARS_MAIN_ADDRESS)
+      queryAddTokenToStorage(ANC_MAIN_ADDRESS)
+    }
   })
 
   // Update token prices in mainnet

@@ -27,6 +27,7 @@ module.exports = {
     },
   },
   variants: {
+    lineClamp: ['responsive'],
     scrollbar: ['rounded'],
     extend: {},
   },
