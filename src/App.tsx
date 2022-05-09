@@ -183,7 +183,10 @@ const App: Component = () => {
             <h1 class="text-2xl md:text-4xl font-semibold text-gray-300 mb-4">
               Coinhall challenge
             </h1>
-            <p class="text-gray-500">Price refreshes on first load</p>
+            <p class="text-gray-500">
+              Price refreshes on first load, <br></br>
+              defaults with astro + mars + anc mainnet tokens
+            </p>
           </div>
           <div class="flex flex-row space-x-2">
             <input
