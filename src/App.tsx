@@ -141,19 +141,25 @@ const App: Component = () => {
     refetch()
   })
 
-  // Add default mainnet tokens if empty
-  createEffect(() => {
-    if (
-      lcd() &&
-      networkMode() === NetworkMode.MAIN &&
-      getModeToken(NetworkMode.MAIN).length === 0
-    ) {
-      console.log('adding default tokens')
-      queryAddTokenToStorage(ASTRO_MAIN_ADDRESS)
-      queryAddTokenToStorage(MARS_MAIN_ADDRESS)
-      queryAddTokenToStorage(ANC_MAIN_ADDRESS)
-    }
-  })
+  // Add default mainnet tokens if empty (only run when lcd updated)
+  createEffect(
+    on(
+      lcd,
+      () => {
+        console.log('checking if default token exists')
+        if (
+          networkMode() === NetworkMode.MAIN &&
+          getModeToken(NetworkMode.MAIN).length === 0
+        ) {
+          console.log('adding default tokens')
+          queryAddTokenToStorage(ASTRO_MAIN_ADDRESS)
+          queryAddTokenToStorage(MARS_MAIN_ADDRESS)
+          queryAddTokenToStorage(ANC_MAIN_ADDRESS)
+        }
+      },
+      { defer: true }
+    )
+  )
 
   // Update token prices in mainnet
   onMount(() => {
