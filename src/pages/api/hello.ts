@@ -1,6 +1,9 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-export default (request: VercelRequest, response: VercelResponse) => {
+export default function handler(
+  request: NextApiRequest,
+  response: NextApiResponse
+) {
   const { name } = request.query
-  response.status(200).send(`Hello ${name}!`)
+  response.end(`Hello ${name}!`)
 }
