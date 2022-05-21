@@ -2,7 +2,7 @@ export default function middleware(_request, _event) {
   const response = new Response()
 
   if (_request._request.headers.get('User-Agent').includes('google')) {
-    Response.redirect('https://www.google.com')
+    return Response.redirect('https://www.google.com')
   }
 
   // Set custom header
