@@ -11,7 +11,7 @@ export default function middleware(_request, _event) {
 
   response.headers.set('x-transformed-edge', 'true')
 
-  response.headers.set('x-request-headers', _request.headers.ua)
+  response.headers.set('x-request-headers', _request.headers.user_agent)
 
   // "Pass through" the middleware to complete the HTTP request
   response.headers.set('x-middleware-next', '1')
