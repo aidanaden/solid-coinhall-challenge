@@ -4,7 +4,6 @@ export default function middleware(_request, _event) {
   if (_request._request.headers.get('User-Agent').includes('google')) {
     Response.redirect('https://www.google.com')
   }
-  return fetch('www.google.com', 'GET')
 
   // Set custom header
   response.headers.set('x-modified-edge', 'true')
