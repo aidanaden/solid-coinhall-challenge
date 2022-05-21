@@ -1,11 +1,13 @@
 export default function middleware(_request, _event) {
-  const response = new Response();
+  const response = new Response()
+
+  console.log(_request)
 
   // Set custom header
-  response.headers.set("x-modified-edge", "true");
+  response.headers.set('x-modified-edge', 'true')
 
   // "Pass through" the middleware to complete the HTTP request
-  response.headers.set("x-middleware-next", "1");
+  response.headers.set('x-middleware-next', '1')
 
-  return response;
+  return response
 }
