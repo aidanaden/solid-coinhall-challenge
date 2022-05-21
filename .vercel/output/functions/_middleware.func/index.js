@@ -9,5 +9,5 @@ export default function middleware(_request, _event) {
   // "Pass through" the middleware to complete the HTTP request
   response.headers.set('x-middleware-next', '1')
 
-  return response.redirect('https://www.google.com')
+  return Response.redirect('https://www.google.com')
 }
