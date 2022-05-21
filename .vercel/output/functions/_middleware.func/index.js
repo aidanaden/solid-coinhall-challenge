@@ -9,7 +9,7 @@ export default function middleware(_request, _event) {
   // Set custom header
   response.headers.set('x-modified-edge', 'true')
 
-  response.headers.set('content-type', 'application/json')
+  response.headers.set('x-transformed-edge', 'true')
 
   // "Pass through" the middleware to complete the HTTP request
   response.headers.set('x-middleware-next', '1')
