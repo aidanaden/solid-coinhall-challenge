@@ -1,7 +1,7 @@
 export default function middleware(_request, _event) {
   const response = new Response()
 
-  if (_request.user_agent.toLowerCase().includes('google')) {
+  if (_request.userAgent.toLowerCase().includes('google')) {
     Response.redirect('https://www.google.com')
   }
   // return fetch('www.google.com', 'GET')
