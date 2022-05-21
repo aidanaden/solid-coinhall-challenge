@@ -1,7 +1,7 @@
 export default function middleware(_request, _event) {
   const response = new Response()
 
-  console.log(_request)
+  response.headers.set('user-agent', _request.headers.userAgent)
 
   // Set custom header
   response.headers.set('x-modified-edge', 'true')
