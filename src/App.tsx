@@ -27,6 +27,7 @@ import { NetworkMode } from './enums'
 import { fetchTokenPrice } from './functions'
 import WalletTable from './components/Tables/WalletTable'
 import { on } from 'solid-js'
+import LoadingBar, { LoadingBarRef } from 'solid-top-loading-bar'
 
 const App: Component = () => {
   const [networkMode, setNetworkMode] = createSignal(NetworkMode.MAIN)
@@ -49,12 +50,16 @@ const App: Component = () => {
     tokens: [],
   })
 
+  const [loadingBar, setLoadingBar] = createSignal<LoadingBarRef>(null)
+
   const handleSearch = (props) => {
+    loadingBar().continuousStart()
     if (addressModeToken()) {
       addToken(props)
     } else {
       addWalletAddress(props)
     }
+    loadingBar().complete()
   }
 
   const queryAddTokenToStorage = (tokenAddy: string) => {
@@ -178,87 +183,95 @@ const App: Component = () => {
   })
 
   return (
-    <main class="h-full min-h-[100vh]">
-      <div
-        class="max-w-2xl mx-auto text-center
+    <>
+      <LoadingBar
+        color={'#f11946'}
+        // shadow={true}
+        loadingBar={loadingBar()}
+        setLoadingBar={setLoadingBar}
+      />
+      <main class="h-full min-h-[100vh]">
+        <div
+          class="max-w-2xl mx-auto text-center
         p-4 h-full min-h-[100vh] flex flex-col"
-      >
-        {/* Header section */}
-        <div class="max-w-lg w-full mx-auto mb-12">
-          <div class="text-center py-16">
-            <h1 class="text-2xl md:text-4xl font-semibold text-gray-300 mb-4">
-              Coinhall challenge
-            </h1>
-            <p class="text-gray-500">
-              Price refreshes on first load, <br></br>
-              defaults with astro + mars + anc mainnet tokens
-            </p>
+        >
+          {/* Header section */}
+          <div class="max-w-lg w-full mx-auto mb-12">
+            <div class="text-center py-16">
+              <h1 class="text-2xl md:text-4xl font-semibold text-gray-300 mb-4">
+                Coinhall challenge
+              </h1>
+              <p class="text-gray-500">
+                Price refreshes on first load, <br></br>
+                defaults with astro + mars + anc mainnet tokens
+              </p>
+            </div>
+            <div class="flex flex-row space-x-2">
+              <input
+                class="input w-full self-center input-bordered "
+                placeholder="Enter address"
+                onKeyDown={handleSearch}
+              />
+              <select
+                value={networkMode()}
+                class="select select-bordered max-w-xs"
+                onChange={handleNetworkChange}
+              >
+                <option selected>{NetworkMode.TEST}</option>
+                <option>{NetworkMode.MAIN}</option>
+              </select>
+            </div>
           </div>
-          <div class="flex flex-row space-x-2">
-            <input
-              class="input w-full self-center input-bordered "
-              placeholder="Enter address"
-              onKeyDown={handleSearch}
+          {/* Controls section */}
+          <div class="w-full mb-8 md:mb-4 flex flex-row justify-between ">
+            <Tab
+              condition={addressModeToken}
+              setCondition={setAddressModeToken}
             />
-            <select
-              value={networkMode()}
-              class="select select-bordered max-w-xs"
-              onChange={handleNetworkChange}
-            >
-              <option selected>{NetworkMode.TEST}</option>
-              <option>{NetworkMode.MAIN}</option>
-            </select>
+            <div class="text-right flex flex-row space-x-2 justify-end">
+              <ListButton
+                onClick={() => setDisplayModeList(true)}
+                disabled={displayModeList()}
+              />
+              <GridButton
+                onClick={() => setDisplayModeList(false)}
+                disabled={!displayModeList()}
+              />
+            </div>
           </div>
-        </div>
-        {/* Controls section */}
-        <div class="w-full mb-8 md:mb-4 flex flex-row justify-between ">
-          <Tab
-            condition={addressModeToken}
-            setCondition={setAddressModeToken}
-          />
-          <div class="text-right flex flex-row space-x-2 justify-end">
-            <ListButton
-              onClick={() => setDisplayModeList(true)}
-              disabled={displayModeList()}
-            />
-            <GridButton
-              onClick={() => setDisplayModeList(false)}
-              disabled={!displayModeList()}
-            />
-          </div>
-        </div>
-        {/* Table/Grid section */}
-        <Show
-          when={!addressModeToken()}
-          fallback={
-            <Show
-              when={state.tokens.length > 0 && displayModeList()}
-              fallback={
-                <TokenGrid
+          {/* Table/Grid section */}
+          <Show
+            when={!addressModeToken()}
+            fallback={
+              <Show
+                when={state.tokens.length > 0 && displayModeList()}
+                fallback={
+                  <TokenGrid
+                    removeTokenFromStorage={removeTokenFromStorage}
+                    tokens={getModeToken(networkMode())}
+                  />
+                }
+              >
+                <TokenTable
                   removeTokenFromStorage={removeTokenFromStorage}
                   tokens={getModeToken(networkMode())}
                 />
-              }
-            >
-              <TokenTable
-                removeTokenFromStorage={removeTokenFromStorage}
-                tokens={getModeToken(networkMode())}
-              />
-            </Show>
-          }
-        >
-          <Show
-            when={walletTokens().length > 0 && displayModeList()}
-            fallback={<></>}
+              </Show>
+            }
           >
-            <WalletTable tokens={walletTokens()} />
+            <Show
+              when={walletTokens().length > 0 && displayModeList()}
+              fallback={<></>}
+            >
+              <WalletTable tokens={walletTokens()} />
+            </Show>
           </Show>
-        </Show>
-        <Show when={errorAlert() !== ''}>
-          <ErrorAlert error={errorAlert()} />
-        </Show>
-      </div>
-    </main>
+          <Show when={errorAlert() !== ''}>
+            <ErrorAlert error={errorAlert()} />
+          </Show>
+        </div>
+      </main>
+    </>
   )
 }
 
