@@ -53,13 +53,11 @@ const App: Component = () => {
   const [loadingBar, setLoadingBar] = createSignal<LoadingBarRef>(null)
 
   const handleSearch = (props) => {
-    loadingBar().continuousStart()
     if (addressModeToken()) {
       addToken(props)
     } else {
       addWalletAddress(props)
     }
-    loadingBar().complete()
   }
 
   const queryAddTokenToStorage = (tokenAddy: string) => {
@@ -103,6 +101,7 @@ const App: Component = () => {
   const addWalletAddress = ({ target, keyCode }) => {
     const walletAddress = target.value.trim()
     if (keyCode == ENTER_KEY && walletAddress) {
+      loadingBar().continuousStart()
       lcd()
         .bank.balance(walletAddress)
         .then((val) => {
@@ -121,6 +120,7 @@ const App: Component = () => {
           setErrorAlert(`${err}!`)
         })
       target.value = ''
+      loadingBar().complete()
     }
   }
 
