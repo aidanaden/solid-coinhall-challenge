@@ -35,7 +35,7 @@
     "solid-js": "^1.3.13",
     "solid-markdown": "^1.2.0",
     "solid-slider": "^1.2.7",
-    "solid-top-loading-bar": "^0.2.18",
+    "solid-top-loading-bar": "^0.2.20",
     "typescript": "^4.6.3",
     "vite-compatible-readable-stream": "^3.6.0",
     "yarn": "^1.22.18"
